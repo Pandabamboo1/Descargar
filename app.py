@@ -12,6 +12,20 @@ CORS(app)
 DOWNLOAD_FOLDER = Path("downloads")
 DOWNLOAD_FOLDER.mkdir(exist_ok=True)
 
+@app.route('/', methods=['GET'])
+def home():
+    """Página de inicio"""
+    return jsonify({
+        'message': '🎬 API de Descargador Universal',
+        'status': 'online',
+        'endpoints': {
+            '/health': 'Verificar estado del servicio',
+            '/api/download': 'POST - Descargar video/audio',
+            '/api/file/<filename>': 'GET - Descargar archivo'
+        },
+        'usage': 'Usa la interfaz web para interactuar con esta API'
+    })
+
 @app.route('/health', methods=['GET'])
 def health():
     """Health check"""
