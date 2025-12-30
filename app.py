@@ -36,6 +36,10 @@ def download_media():
     """Endpoint principal para descargar media"""
     try:
         data = request.json
+        
+        if not data:
+            return jsonify({'error': 'No se recibieron datos'}), 400
+        
         url = data.get('url')
         media_type = data.get('type', 'video')
         quality = data.get('quality', 'best')
@@ -70,7 +74,7 @@ def download_media():
             # Buscar el archivo descargado
             possible_files = list(DOWNLOAD_FOLDER.glob(f"{download_id}.*"))
             if not possible_files:
-                return jsonify({'error': 'Archivo no encontrado'}), 500
+                return jsonify({'error': 'Archivo no encontrado después de descarga'}), 500
             
             filepath = possible_files[0]
 
@@ -82,6 +86,7 @@ def download_media():
             })
 
     except Exception as e:
+        print(f"Error en descarga: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/file/<filename>', methods=['GET'])
@@ -90,9 +95,14 @@ def get_file(filename):
     try:
         filepath = DOWNLOAD_FOLDER / filename
         if filepath.exists():
-            return send_file(filepath, as_attachment=True, download_name=filename)
+            return send_file(
+                filepath, 
+                as_attachment=True, 
+                download_name=filename
+            )
         return jsonify({'error': 'Archivo no encontrado'}), 404
     except Exception as e:
+        print(f"Error sirviendo archivo: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
